@@ -1,3 +1,4 @@
+from os import name
 import matplotlib.pyplot as plt
 import numpy as np
 import json
@@ -144,7 +145,7 @@ def show_in_3d(locations, color_points=True, labels=False, print_connections=Fal
             blue_points[0],
             blue_points[1],
             blue_points[2],
-            c="b",
+            c="#51ace8",
             marker="o",
             s=points_size * pow(grid_size, 1 / 5) * points_size_ratio,
         )
@@ -207,33 +208,38 @@ def generate_empty_locations(grid_size):
     return locations
 
 
-def show_from_files(filenames, dim=3):
+def show_from_files(filenames, labels=False, dim=3):
     for filename in filenames:
         if filename.endswith(".json"):
             locations = import_locations_from_json(filename, dim)
         else:
             locations = import_locations_from_txt(filename, dim)
         if dim == 3:
-            show_in_3d(locations)
+            show_in_3d(locations, labels=labels)
         elif dim == 2:
             show_in_2d(locations)
 
 
-filenames_txt = ["3_towers.txt", "8_towers.txt"]
-show_from_files(filenames_txt)
+if __name__ == "__main__":
+    filenames_txt = [
+        "5_queens.txt",
+        "6_queens.txt",
+        "7_queens.txt",
+        "8_queens.txt",
+    ]
 
+    show_from_files(filenames_txt, labels=False)
 
-empty_locations = generate_empty_locations(4)
-show_in_3d(empty_locations)
-show_in_3d(empty_locations, labels=True)
+    empty_locations_4 = generate_empty_locations(4)
+    empty_locations_6 = generate_empty_locations(6)
+    # show_in_3d(empty_locations)
+    # show_in_3d(empty_locations_4, labels=True, color_points=False)
+    # show_in_3d(empty_locations_6, labels=True, color_points=False)
 
+    empty_locations = generate_empty_locations(6)
+    # show_in_3d(empty_locations, color_points=False)
 
-empty_locations = generate_empty_locations(6)
-show_in_3d(empty_locations, color_points=False)
+    # print_indexes(4)
 
-
-print_indexes(4)
-
-
-filenames_json = ["8_queens.json"]
-show_from_files(filenames_json, dim=2)
+    filenames_json = ["8_queens.json"]
+    # show_from_files(filenames_json, dim=2)

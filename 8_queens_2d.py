@@ -8,7 +8,6 @@ import json
 # Set model parameters
 NB_QUEEN = 8
 
-
 # -----------------------------------------------------------------------------
 # Build the model
 # -----------------------------------------------------------------------------
@@ -34,14 +33,13 @@ mdl.add(mdl.all_diff(locations[i] - i for i in range(NB_QUEEN)))
 # -----------------------------------------------------------------------------
 
 # Solve model
-print("Solving model....")
 msol = mdl.solve(TimeLimit=10)
 
 # Print solution
 if msol:
     print("Solution:", end="")
     for v in locations:
-        print(f" {msol[v]}", end="")
+        print(f" {msol[v]},", end="")
     print("\n")
     # Draw chess board
     for l in range(NB_QUEEN):
