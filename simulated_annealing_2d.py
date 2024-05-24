@@ -94,7 +94,7 @@ class SimulatedAnnealing2D:
         print(f"Cost: {self.best_cost}")
         print(f"Number of iterations: {self.iterations}")
 
-    def execute(
+    def run_annealing_and_save(
         self,
         grid_size=None,
         temperature=1.0,
@@ -113,3 +113,26 @@ class SimulatedAnnealing2D:
             self.print_results()
 
         self.save_positions_to_json(annealing_position)
+
+    def run_annealing_multiple(
+        self,
+        number_of_iterations=25,
+        grid_size=None,
+        temperature=1.0,
+        cooling_rate=0.98,
+        max_iterations_annealing=1000,
+    ):
+        if grid_size is not None:
+            self.grid_size = grid_size
+
+        self.costs = []
+
+        for _ in range(number_of_iterations):
+            _, best_cost, _ = self.simulated_annealing(
+                temperature, cooling_rate, max_iterations_annealing
+            )
+
+            self.costs.append(best_cost)
+
+        self.cost_mean = sum(self.costs) / number_of_iterations
+        return self.costs

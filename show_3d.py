@@ -114,7 +114,7 @@ def show_in_2d(locations):
 
     plt.title(f"Grid for {grid_size}x{grid_size}", fontsize=20)
     plt.grid()
-    plt.legend()
+    plt.legend(loc="upper right", bbox_to_anchor=(1, 0.5))
     plt.show()
 
 
