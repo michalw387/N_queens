@@ -1,92 +1,115 @@
 import random
 import math
 import os
-import numpy as np
 import json
 
-GRID_SIZE = 8
+DEFAULT_GRID_SIZE = 8
 
 
-def random_positions(grid_size=GRID_SIZE):
-    return random.sample(range(1, grid_size + 1), grid_size)
+class SimulatedAnnealing2D:
 
+    def __init__(self, grid_size=DEFAULT_GRID_SIZE):
+        self.grid_size = grid_size
 
-def cost(positions):
-    cost = 0
-    for i in range(GRID_SIZE):
-        for j in range(i + 1, GRID_SIZE):
-            if (
-                positions[i] == positions[j]
-                or abs(positions[i] - positions[j]) == j - i
+    def random_positions(self):
+        return random.sample(range(1, self.grid_size + 1), self.grid_size)
+
+    def cost(self, positions):
+        cost = 0
+        for i in range(self.grid_size):
+            for j in range(i + 1, self.grid_size):
+                if (
+                    positions[i] == positions[j]
+                    or abs(positions[i] - positions[j]) == j - i
+                ):
+                    cost += 1
+        return cost
+
+    def generate_different_indexes(self):
+        i, j = 0, 0
+
+        while i == j:
+            i = random.randint(0, self.grid_size - 1)
+            j = random.randint(0, self.grid_size - 1)
+
+        return i, j
+
+    def simulated_annealing(
+        self, temperature=1.0, cooling_rate=0.98, max_iterations=1000
+    ):
+        positions = self.random_positions()
+        best_positions = positions
+        best_cost = self.cost(positions)
+
+        iterations = 0
+
+        while temperature > 0.1 and iterations < max_iterations:
+            new_positions = positions.copy()
+
+            i, j = self.generate_different_indexes()
+
+            new_positions[i], new_positions[j] = new_positions[j], new_positions[i]
+            new_cost = self.cost(new_positions)
+
+            if new_cost < best_cost:
+                best_positions = new_positions
+                best_cost = new_cost
+
+            if new_cost < self.cost(positions):
+                positions = new_positions
+            elif random.random() < pow(
+                math.e, (self.cost(positions) - new_cost) / temperature
             ):
-                cost += 1
-    return cost
+                positions = new_positions
 
+            temperature *= cooling_rate
+            iterations += 1
 
-def generate_different_indexes():
-    i, j = 0, 0
+        self.best_positions = best_positions
+        self.best_cost = best_cost
+        self.iterations = iterations
 
-    while i == j:
-        i = random.randint(0, GRID_SIZE - 1)
-        j = random.randint(0, GRID_SIZE - 1)
+        return best_positions, best_cost, iterations
 
-    return i, j
+    def generate_array(self, positions):
+        array = []
+        for i in range(self.grid_size):
+            row = [0] * self.grid_size
+            row[positions[i] - 1] = 1
+            array.append(row)
+        return array
 
+    def save_positions_to_json(self, positions, filename=None):
+        if filename is None:
+            filename = f"{self.grid_size}_queens_annealing.json"
+        file_path = os.path.dirname(__file__) + f"\\locations_files\\2D\\{filename}"
 
-def simulated_annealing(temperature=1.0, cooling_rate=0.98, max_iterations=1000):
-    positions = random_positions()
-    best_positions = positions
-    best_cost = cost(positions)
+        positions = self.generate_array(positions)
 
-    iterations = 0
+        with open(file_path, "w") as file:
+            json.dump(positions, file)
 
-    while temperature > 0.1 and iterations < max_iterations:
-        new_positions = positions.copy()
+    def print_results(self):
+        print(f"Positions: {self.best_positions}")
+        print(f"Cost: {self.best_cost}")
+        print(f"Number of iterations: {self.iterations}")
 
-        i, j = generate_different_indexes()
+    def execute(
+        self,
+        grid_size=None,
+        temperature=1.0,
+        cooling_rate=0.98,
+        max_iterations=1000,
+        print_results=False,
+    ):
+        if grid_size is not None:
+            self.grid_size = grid_size
 
-        new_positions[i], new_positions[j] = new_positions[j], new_positions[i]
-        new_cost = cost(new_positions)
+        annealing_position, best_cost, iterations = self.simulated_annealing(
+            temperature, cooling_rate, max_iterations
+        )
 
-        if new_cost < best_cost:
-            best_positions = new_positions
-            best_cost = new_cost
+        if print_results:
+            self.print_results()
 
-        if new_cost < cost(positions):
-            positions = new_positions
-        elif random.random() < pow(math.e, (cost(positions) - new_cost) / temperature):
-            positions = new_positions
-
-        temperature *= cooling_rate
-        iterations += 1
-
-    return best_positions, best_cost, iterations
-
-
-def generate_array(positions):
-    array = []
-    for i in range(GRID_SIZE):
-        row = [0] * GRID_SIZE
-        row[positions[i] - 1] = 1
-        array.append(row)
-    return array
-
-
-def save_positions_to_json(positions, filename=f"{GRID_SIZE}_queens_annealing.json"):
-    file_path = os.path.dirname(__file__) + f"\\locations_files\\2D\\{filename}"
-
-    positions = generate_array(positions)
-
-    with open(file_path, "w") as file:
-        json.dump(positions, file)
-
-
-annealing_position, best_cost, iterations = simulated_annealing(
-    temperature=10, cooling_rate=0.99, max_iterations=1000
-)
-print(f"Postions: {annealing_position}")
-print(f"Cost: {best_cost}")
-print(f"Number of iterations: {iterations}")
-
-
-save_positions_to_json(annealing_position)
+        self.save_positions_to_json(annealing_position)
