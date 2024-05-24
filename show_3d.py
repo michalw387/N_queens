@@ -128,9 +128,9 @@ def show_in_3d(locations, color_points=True, labels=False, print_connections=Fal
     grid_size = round(len(locations) ** (1 / 3))
 
     # # Create 3D grid
-    x = np.array(range(grid_size))
-    y = np.array(range(grid_size))
-    z = np.array(range(grid_size))
+    x = np.array(range(1, grid_size + 1))
+    y = np.array(range(1, grid_size + 1))
+    z = np.array(range(1, grid_size + 1))
     X, Y, Z = np.meshgrid(x, y, z)
     # Y, Z, X = np.meshgrid(x, y, z)
     x, y, z = X.ravel(), Y.ravel(), Z.ravel()
@@ -186,9 +186,9 @@ def show_in_3d(locations, color_points=True, labels=False, print_connections=Fal
     ax.set_ylabel("Y Label")
     ax.set_zlabel("Z Label")
 
-    ax.set_xticks(np.arange(0, grid_size))
-    ax.set_yticks(np.arange(0, grid_size))
-    ax.set_zticks(np.arange(0, grid_size))
+    ax.set_xticks(np.arange(1, grid_size))
+    ax.set_yticks(np.arange(1, grid_size))
+    ax.set_zticks(np.arange(1, grid_size))
 
     plt.title(f"Grid for {grid_size}x{grid_size}x{grid_size}", fontsize=20)
     plt.show()
@@ -201,6 +201,15 @@ def print_indexes(grid_size):
             print("\tsub loop", x_offset + 1)
             for i in range(min(grid_size - x_offset, grid_size - z_offset)):
                 print("\t\t", i + x_offset, i, i + z_offset)
+
+
+def print_indexes_down(grid_size):
+    for z_offset in range(1, grid_size + 1):
+        print("main loop", z_offset + 1)
+        for x_offset in range(1, grid_size - z_offset + 1):
+            print("\tsub loop", x_offset + 1)
+            for i in range(1, min(grid_size - x_offset, grid_size - z_offset) + 1):
+                print("\t\t", i + x_offset, i, grid_size - z_offset + 1 - i)
 
 
 def generate_empty_locations(grid_size):
@@ -221,14 +230,21 @@ def show_from_files(filenames, labels=False, dim=3):
 
 
 if __name__ == "__main__":
+
+    # print_indexes(4)
+
+    # print_indexes_down(4)
+
     filenames_txt = [
         "5_queens.txt",
         "6_queens.txt",
         "7_queens.txt",
-        "8_queens.txt",
     ]
 
+    filenames_txt = ["5_queens.txt", "6_queens.txt"]
+
     show_from_files(filenames_txt, labels=False)
+    show_from_files(filenames_txt, labels=True)
 
     empty_locations_4 = generate_empty_locations(4)
     empty_locations_6 = generate_empty_locations(6)
@@ -238,8 +254,6 @@ if __name__ == "__main__":
 
     empty_locations = generate_empty_locations(6)
     # show_in_3d(empty_locations, color_points=False)
-
-    # print_indexes(4)
 
     filenames_json = ["8_queens.json"]
     # show_from_files(filenames_json, dim=2)

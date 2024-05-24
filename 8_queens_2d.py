@@ -62,7 +62,7 @@ if msol:
         chess_board.append(row)
 
     # Save the chess board as JSON
-    with open(f"{NB_QUEEN}_queens.json", "w") as file:
+    with open(f"/2D/{NB_QUEEN}_queens.json", "w") as file:
         json.dump(chess_board, file)
 else:
     print("Solve status: {}\n".format(msol.get_solve_status()))
