@@ -131,8 +131,7 @@ def show_in_3d(locations, color_points=True, labels=False, print_connections=Fal
     x = np.array(range(1, grid_size + 1))
     y = np.array(range(1, grid_size + 1))
     z = np.array(range(1, grid_size + 1))
-    X, Y, Z = np.meshgrid(x, y, z)
-    # Y, Z, X = np.meshgrid(x, y, z)
+    Y, X, Z = np.meshgrid(x, y, z)
     x, y, z = X.ravel(), Y.ravel(), Z.ravel()
 
     if color_points:
@@ -241,7 +240,7 @@ if __name__ == "__main__":
         "7_queens.txt",
     ]
 
-    filenames_txt = ["5_queens.txt", "6_queens.txt"]
+    filenames_txt = ["5_queens.txt"]
 
     show_from_files(filenames_txt, labels=False)
     show_from_files(filenames_txt, labels=True)
