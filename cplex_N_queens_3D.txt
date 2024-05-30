@@ -1,0 +1,183 @@
+
+int grid_size = 6; 
+				
+range grid_range = 1..grid_size;	
+	
+dvar boolean locations[grid_range][grid_range][grid_range]; 
+
+dexpr int number_of_queens = sum(x, y, z in grid_range) locations[x][y][z];
+
+maximize number_of_queens;
+
+subject to{ 
+
+	forall(x, y in grid_range) sum (z in grid_range) locations[x][y][z] <= 1; 
+	
+	forall(y, z in grid_range) sum (x in grid_range) locations[x][y][z] <= 1; 	
+	
+	forall(x, z in grid_range) sum (y in grid_range) locations[x][y][z] <= 1; 
+
+	// Przekątne w 2D:
+
+	// płaszczyzna X przekątna 1		
+	forall(x in grid_range) 
+		forall(offset in -grid_size+1..0)
+			sum(i in 1..(grid_size + offset))
+				locations[x][i][i - offset] <= 1;
+					
+	forall(x in grid_range) 
+		forall(offset in 0..grid_size-1)
+			sum(i in (1 + offset)..grid_size)
+				locations[x][i][i - offset] <= 1;
+	
+	// płaszczyzna X przekątna 2
+	forall(x in grid_range) 
+		forall(offset in -grid_size+1..0)
+			sum(i in 1..(grid_size + offset))
+				locations[x][grid_size - i + 1 + offset][i] <= 1;
+					
+	forall(x in grid_range) 
+		forall(offset in 0..grid_size-1)
+			sum(i in (1 + offset)..grid_size)
+				locations[x][i][grid_size - i + 1 + offset] <= 1;
+	
+	
+	// płaszczyzna Y przekątna 1
+	forall(y in grid_range) 
+		forall(offset in -grid_size+1..0)
+			sum(i in 1..(grid_size + offset))
+				locations[i][y][i - offset] <= 1;
+					
+	forall(y in grid_range) 
+		forall(offset in 0..grid_size-1)
+			sum(i in (1 + offset)..grid_size)
+				locations[i][y][i - offset] <= 1;
+	
+	// płaszczyzna Y przekątna 2
+	forall(y in grid_range) 
+		forall(offset in -grid_size+1..0)
+			sum(i in 1..(grid_size + offset))
+				locations[grid_size - i + 1 + offset][y][i] <= 1;
+				
+	forall(y in grid_range) 
+		forall(offset in 0..grid_size-1)
+			sum(i in (1 + offset)..grid_size)
+				locations[i][y][grid_size - i + 1 + offset] <= 1;
+				
+				
+	// płaszczyzna Z przekątna 1
+	forall(z in grid_range) 
+		forall(offset in -grid_size+1..0)
+			sum(i in 1..(grid_size + offset))
+				locations[i][i - offset][z] <= 1;
+					
+	forall(z in grid_range) 
+		forall(offset in 0..grid_size-1)
+			sum(i in (1 + offset)..grid_size)
+				locations[i][i - offset][z] <= 1;
+				
+	// płaszczyzna X przekątna 2
+	forall(z in grid_range) 
+		forall(offset in -grid_size+1..0)
+			sum(i in 1..(grid_size + offset))
+				locations[grid_size - i + 1 + offset][i][z] <= 1;
+					
+	forall(z in grid_range) 
+		forall(offset in 0..grid_size-1)
+			sum(i in (1 + offset)..grid_size)
+				locations[i][grid_size - i + 1 + offset][z] <= 1;
+				
+	// Przekątne w 3D:
+	
+	// Pierwsza przekątna
+	
+	forall(z_offset in 0..grid_size - 1) 
+		forall(x_offset in 0..(grid_size - 1))
+				sum(i in 1..(grid_size - x_offset): i <= grid_size - z_offset)
+						locations[i + x_offset][i][i + z_offset] <= 1;
+						
+	forall(z_offset in 0..grid_size - 1) 
+		forall(y_offset in 0..(grid_size - 1))
+				sum(i in 1..(grid_size - y_offset): i <= grid_size - z_offset)
+						locations[i][i + y_offset][i + z_offset] <= 1;
+						
+	forall(offset in 1..grid_size - 1)
+		forall(x_offset in 0..(grid_size - offset - 1))
+			sum(i in 1..(grid_size - offset - x_offset))
+				locations[i + offset + x_offset][i + offset][i] <= 1;
+				
+	forall(offset in 1..grid_size - 1)
+		forall(y_offset in 0..(grid_size - offset - 1))
+			sum(i in 1..(grid_size - offset - y_offset))
+				locations[i + offset][i + offset + y_offset][i] <= 1;
+				
+				
+	// Druga przekątna
+	
+	forall(z_offset in 0..grid_size - 1)
+		forall(y_offset in 0..(grid_size - 1))
+			sum(i in 1..(grid_size - y_offset): i <= grid_size - z_offset)
+				locations[grid_size - i + 1][i + y_offset][i + z_offset] <= 1;
+	
+	forall(z_offset in 0..grid_size)
+		forall(x_offset in 0..(grid_size - 1))
+			sum(i in 1..(grid_size - x_offset): i <= grid_size - z_offset)
+				locations[grid_size - i -  x_offset + 1][i][i + z_offset] <= 1;
+	
+	forall(offset in 1..grid_size - 1)
+		forall(x_offset in 0..(grid_size - offset - 1))
+			sum(i in 1..(grid_size - offset - x_offset))
+				locations[grid_size - i - offset - x_offset + 1][i + offset][i] <= 1;
+	
+	forall(offset in 1..grid_size - 1)
+		forall(y_offset in 1..(grid_size - offset - 1))
+			sum(i in 1..(grid_size - offset - y_offset))
+				locations[grid_size - i - offset + 1][i + offset + y_offset][i] <= 1;
+				
+				
+	// Trzecia przekątna 
+	
+	forall(z_offset in 0..grid_size - 1)
+		forall(y_offset in 0..(grid_size - 1))
+			sum(i in 1..(grid_size - y_offset): i <= grid_size - z_offset)
+				locations[i][grid_size - i - y_offset +1][i + z_offset] <= 1;
+				
+	forall(z_offset in 0..grid_size - 1)
+		forall(x_offset in 0..(grid_size - 1))
+			sum(i in 1..(grid_size - x_offset): i <= grid_size - z_offset)
+				locations[i + x_offset][grid_size - i +1][i + z_offset] <= 1;
+				
+	forall(offset in 1..grid_size - 1)
+		forall(y_offset in 0..(grid_size - offset - 1))
+			sum(i in 1..(grid_size - offset - y_offset))
+				locations[i + offset][grid_size - y_offset - i - offset + 1][i] <= 1;
+				
+	forall(offset in 1..grid_size -1)
+		forall(x_offset in 1..(grid_size - offset - 1))
+			sum(i in 1..(grid_size - offset - x_offset))
+				locations[i + offset +x_offset][grid_size - i - offset + 1][i] <= 1;
+	
+	
+	// Czwarta przekątna 
+	
+	forall(z_offset in 0..grid_size - 1)
+		forall(x_offset in 0..(grid_size - 1))
+			sum(i in 1..(grid_size - x_offset): i <= grid_size - z_offset)
+				locations[grid_size - i -  x_offset + 1][grid_size - i + 1][i + z_offset] <= 1;		
+				
+	forall(z_offset in 0..grid_size - 1)
+		forall(y_offset in 0..(grid_size - 1))
+			sum(i in 1..(grid_size - y_offset): i <= grid_size - z_offset)
+				locations[grid_size - i + 1][grid_size - i - y_offset + 1][i + z_offset] <= 1;
+				
+	forall(offset in 1..grid_size -1)
+		forall(x_offset in 0..(grid_size - offset - 1))
+			sum(i in 1..(grid_size - offset - x_offset))
+				locations[grid_size - i - offset - x_offset + 1][grid_size - i - offset + 1][i] <= 1;
+				
+	forall(offset in 1..grid_size - 1)
+		forall(y_offset in 1..(grid_size - offset - 1))
+			sum(i in 1..(grid_size - offset - y_offset))
+				locations[grid_size - i - offset + 1][grid_size - i - offset - y_offset + 1][i] <= 1;
+	
+}

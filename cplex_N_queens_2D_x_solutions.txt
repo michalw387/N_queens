@@ -1,0 +1,42 @@
+/*********************************************
+ * OPL 22.1.1.0 Model
+ * Author: michal
+ * Creation Date: Apr 26, 2024 at 5:36:10 PM
+ *********************************************/
+
+
+int n = 8; 
+				
+range n_range = 1..n;	
+		
+int solutions = 4;
+
+range s_range = 1..solutions;
+
+dvar boolean locations[1..solutions][n_range][n_range]; 
+
+
+subject to{ 
+
+	// ograniczenia hetmanów w wierszach i kolumnach:
+	forall(s in s_range, i in n_range) sum (j in n_range) locations[s][i][j] == 1; 
+	forall(s in s_range, j in n_range) sum (i in n_range) locations[s][i][j] == 1; 	
+	
+	// ograniczenia hetmanów na przekątnych:
+	
+	// przekątne w prawo dół:
+		// powyżej przekątnej
+	forall(s in s_range, offset in 0..n-1) sum(i in 1..n-offset) locations[s][i][i + offset] <= 1;
+		// poniżej przekątnej
+	forall(s in s_range, offset in 1..n-1) sum(i in 1..n-offset) locations[s][i + offset][i] <= 1;
+	
+	// przekątne w prawo góra:
+		// powyżej przeciwprzekątnej
+	forall(s in s_range, offset in 0..n-1) sum(i in 1..n-offset) locations[s][n - offset + 1 - i][i] <= 1;
+		// poniżej przeciwprzekątnej
+	forall(s in s_range, offset in 1..n-1) sum(i in 1 + offset..n) locations[s][n + offset + 1 - i][i] <= 1;
+
+	// sprawdzenie czy lokalizacje różnią się od siebie
+	forall(s1, s2 in s_range: s1 != s2) sum(i, j in n_range) (locations[s1][i][j] != locations[s2][i][j]) >= 1;
+
+}

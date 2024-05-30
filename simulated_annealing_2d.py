@@ -2,6 +2,11 @@ import random
 import math
 import os
 import json
+import numpy as np
+import matplotlib.pyplot as plt
+
+from show_3d import show_from_files
+
 
 DEFAULT_GRID_SIZE = 8
 
@@ -91,7 +96,7 @@ class SimulatedAnnealing2D:
 
     def print_results(self):
         print(f"Positions: {self.best_positions}")
-        print(f"Cost: {self.best_cost}")
+        print(f"Cost (number of conflicts): {self.best_cost} ")
         print(f"Number of iterations: {self.iterations}")
 
     def run_annealing_and_save(
@@ -105,7 +110,7 @@ class SimulatedAnnealing2D:
         if grid_size is not None:
             self.grid_size = grid_size
 
-        annealing_position, best_cost, iterations = self.simulated_annealing(
+        annealing_position, _, _ = self.simulated_annealing(
             temperature, cooling_rate, max_iterations
         )
 
@@ -118,9 +123,9 @@ class SimulatedAnnealing2D:
         self,
         number_of_iterations=25,
         grid_size=None,
-        temperature=1.0,
+        starting_temperature=1.0,
         cooling_rate=0.98,
-        max_iterations_annealing=1000,
+        annealing_max_iterations=1000,
     ):
         if grid_size is not None:
             self.grid_size = grid_size
@@ -129,10 +134,106 @@ class SimulatedAnnealing2D:
 
         for _ in range(number_of_iterations):
             _, best_cost, _ = self.simulated_annealing(
-                temperature, cooling_rate, max_iterations_annealing
+                starting_temperature, cooling_rate, annealing_max_iterations
             )
 
             self.costs.append(best_cost)
 
         self.cost_mean = sum(self.costs) / number_of_iterations
-        return self.costs
+        return self.cost_mean
+
+    def run_single_annealing(
+        self,
+        grid_size=10,
+        temperature=1,
+        cooling_rate=0.99,
+        max_iterations=1000,
+        show_results=False,
+    ):
+        simulated_annealing = SimulatedAnnealing2D()
+
+        simulated_annealing.run_annealing_and_save(
+            grid_size, temperature, cooling_rate, max_iterations
+        )
+
+        if show_results:
+            print("--------------------")
+            print("Results for single annealing:")
+            simulated_annealing.print_results()
+
+            filename = f"{simulated_annealing.grid_size}_queens_annealing.json"
+
+            show_from_files([filename], dim=2)
+            print("--------------------")
+
+        return simulated_annealing.best_cost, simulated_annealing.iterations
+
+    def run_multiple_annealings_and_plot(
+        self,
+        type="cooling_rate",
+        grid_size=8,
+        repeat_iterations=200,
+        temperature=1,
+        cooling_rate=0.99,
+        max_iterations=1000,
+    ):
+
+        simulated_annealing = SimulatedAnnealing2D()
+
+        mean_costs = []
+
+        if type == "cooling rate":
+            cooling_rates = np.arange(0.8, 0.99, 0.01)
+
+            for cr in cooling_rates:
+                simulated_annealing.run_annealing_multiple(
+                    number_of_iterations=repeat_iterations,
+                    grid_size=grid_size,
+                    starting_temperature=temperature,
+                    cooling_rate=cr,
+                    annealing_max_iterations=max_iterations,
+                )
+                mean_costs.append(simulated_annealing.cost_mean)
+
+            self.plot_costs(cooling_rates, mean_costs, type)
+
+        if type == "temperature":
+            temperatures = np.arange(1, 10, 0.5)
+
+            for temp in temperatures:
+                simulated_annealing.run_annealing_multiple(
+                    number_of_iterations=repeat_iterations,
+                    grid_size=grid_size,
+                    starting_temperature=temp,
+                    cooling_rate=cooling_rate,
+                    annealing_max_iterations=max_iterations,
+                )
+                mean_costs.append(simulated_annealing.cost_mean)
+
+            self.plot_costs(temperatures, mean_costs, type)
+
+        if type == "grid size":
+            grid_sizes = np.arange(4, 11, 1)
+
+            for grid_size in grid_sizes:
+                simulated_annealing.run_annealing_multiple(
+                    number_of_iterations=repeat_iterations,
+                    grid_size=grid_size,
+                    starting_temperature=temperature,
+                    cooling_rate=cooling_rate,
+                    annealing_max_iterations=max_iterations,
+                )
+                mean_costs.append(simulated_annealing.cost_mean)
+
+            self.plot_costs(grid_sizes, mean_costs, type)
+
+        return mean_costs
+
+    @staticmethod
+    def plot_costs(x, y, title):
+        plt.plot(x, y)
+        plt.xlabel(title)
+        plt.ylabel("Mean costs")
+        plt.title(f"Mean cost for different {title}")
+        plt.grid()
+        plt.show()

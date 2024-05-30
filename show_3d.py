@@ -1,7 +1,7 @@
 from os import name
-import matplotlib.pyplot as plt
 import numpy as np
 import json
+import matplotlib.pyplot as plt
 
 
 def get_file_path(filename, dim=3):
@@ -234,25 +234,20 @@ if __name__ == "__main__":
 
     # print_indexes_down(4)
 
-    filenames_txt = [
-        "5_queens.txt",
-        "6_queens.txt",
-        "7_queens.txt",
-    ]
-
-    filenames_txt = ["5_queens.txt"]
+    filenames_txt = ["3_queens.txt", "4_queens.txt", "5_queens.txt", "6_queens.txt"]
 
     show_from_files(filenames_txt, labels=False)
     show_from_files(filenames_txt, labels=True)
 
-    empty_locations_4 = generate_empty_locations(4)
-    empty_locations_6 = generate_empty_locations(6)
+    # empty_locations_4 = generate_empty_locations(4)
+    # empty_locations_6 = generate_empty_locations(6)
+
     # show_in_3d(empty_locations)
     # show_in_3d(empty_locations_4, labels=True, color_points=False)
     # show_in_3d(empty_locations_6, labels=True, color_points=False)
 
-    empty_locations = generate_empty_locations(6)
+    # empty_locations = generate_empty_locations(6)
     # show_in_3d(empty_locations, color_points=False)
 
-    filenames_json = ["8_queens.json"]
+    # filenames_json = ["8_queens.json"]
     # show_from_files(filenames_json, dim=2)
