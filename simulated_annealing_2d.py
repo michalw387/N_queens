@@ -40,9 +40,15 @@ class SimulatedAnnealing2D:
         return i, j
 
     def simulated_annealing(
-        self, temperature=1.0, cooling_rate=0.98, max_iterations=1000
+        self,
+        temperature=1.0,
+        cooling_rate=0.98,
+        max_iterations=1000,
+        starting_position=None,
     ):
-        positions = self.random_positions()
+        positions = (
+            self.random_positions() if starting_position is None else starting_position
+        )
         best_positions = positions
         best_cost = self.cost(positions)
 
@@ -132,9 +138,11 @@ class SimulatedAnnealing2D:
 
         self.costs = []
 
+        positions = self.random_positions()
+
         for _ in range(number_of_iterations):
             _, best_cost, _ = self.simulated_annealing(
-                starting_temperature, cooling_rate, annealing_max_iterations
+                starting_temperature, cooling_rate, annealing_max_iterations, positions
             )
 
             self.costs.append(best_cost)
